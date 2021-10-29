@@ -84,7 +84,7 @@ func (c *Client) writeMessages() {
 			messageString := "{\"message\":" + message.GetMessage() +
 				"\", \"senderId\":" + message.GetSenderID() +
 				"\", \"userId\": \"" + message.GetUserID() +
-				"\" , \"storeId\": \"" + strconv.Itoa((int)(20)) +"\" }"
+				"\" , \"storeId\": \"" + strconv.Itoa(int(message.GetStoreID())) +"\" }"
 
 			tempJson, _ := json.Marshal(messageString)
 
