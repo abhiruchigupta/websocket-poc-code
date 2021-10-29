@@ -68,7 +68,7 @@ func (h *Hub) Run() {
 			log.Println("hub broadcasting message")
 			clients := h.clientReg[message.GetUserID()]
 			for _, client := range clients {
-				log.Printf("found client to send msgo to")
+				log.Printf("found client to send msg to")
 				select {
 				case client.send <- message:
 				default:
@@ -106,6 +106,7 @@ type InfoWsMessage struct {
 	message string
 	userID  string
 	storeID int64
+	senderID string
 }
 
 func (i InfoWsMessage) GetUserID() string {
@@ -120,12 +121,24 @@ func (i InfoWsMessage) GetStoreID() int64 {
 	return i.storeID
 }
 
+func (i InfoWsMessage) GetSenderID() string {
+	return i.senderID
+}
+
 func (h *Hub) PostEvent(w http.ResponseWriter, r *http.Request) {
 	userID := r.Header.Get("X-Compass-WS-User")
+	senderID := r.Header.Get("X-Compass-WS-Sender")
+
 	if userID == "" {
 		w.WriteHeader(500)
 		return
 	}
+
+	if senderID == "" {
+		w.WriteHeader(500)
+		return
+	}
+
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		w.WriteHeader(500)
@@ -141,12 +154,13 @@ func (h *Hub) PostEvent(w http.ResponseWriter, r *http.Request) {
 		userID:  userID,
 		message: info.Message,
 		storeID: 0,
+		senderID: senderID,
 	}
 	h.BroadcastMessage(message)
 }
 
 func (h *Hub) BroadcastMessage(message WsMessage) {
-	log.Printf("userID: %s, message: %s\n", message.GetUserID(), message.GetMessage())
+	log.Printf("userID: %s, message: %s, senderID: %s\n", message.GetUserID(), message.GetMessage(), message.GetSenderID())
 	h.broadcast <- message
 }
 
@@ -164,10 +178,11 @@ func (h *Hub) HandleMissedEvents () {
 		log.Printf("Checking missed events for user %s", userId)
 		dbMessages := h.store.RetrieveUnsentMessages(userId)
 		for _, msg := range dbMessages {
-			eventMessage := ListingEvent{
+			eventMessage := MessageEvent{
 				UserId: userId,
 				Message: *msg.Message,
 				StoreId: *msg.ID,
+				SenderId: *msg.SenderID,
 			}
 			h.BroadcastMessage(eventMessage)
 		}

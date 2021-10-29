@@ -13,8 +13,24 @@ import (
 	"github.com/gorilla/websocket"
 )
 
+
+type WsMessage interface {
+	GetUserID() string
+	GetStoreID() int64
+	GetMessage() string
+	GetSenderID() string
+}
+
+type InfoWsMessage struct {
+	message string
+	userID  string
+	storeID int64
+	senderID string
+}
+
 var addr = flag.String("addr", "localhost:8080", "http service address")
 var userID = flag.String("userid", "foo", "userID for the subscribing client")
+
 
 func main() {
 	flag.Parse()
@@ -41,13 +57,35 @@ func main() {
 
 	go func() {
 		for {
+			//var msg string
+
+			//err := c.ReadJSON(&msg)
+
 			_, message, err := c.ReadMessage()
+			//data := []byte(message)
+
+			log.Printf("recv: %s", message)
+
+			//log.Println("msg rcvd: ", message)
+
+			//var input InfoWsMessage
+			//
+			//err = json.Unmarshal(data, &input)
+			//fmt.Println(err)
+
+			//fmt.Printf("%v , %v, %v, %v", input.message, input.senderID, input.storeID, input.userID)
+
+			//log.Println("error: , msg: , final json: input", err, msg, input)
+
+
+
 			if err != nil {
 				log.Println("read:", err)
 				done <- struct{}{}
 				return
 			}
-			log.Printf("recv: %s", message)
+
+			//log.Print("recv: %v from sender: %v", input.message, input.senderID)
 		}
 	}()
 

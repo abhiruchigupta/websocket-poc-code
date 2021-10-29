@@ -1,8 +1,14 @@
 package ws
 
 import (
+	"encoding/json"
+	"fmt"
+	"strconv"
+
+	//"fmt"
 	"log"
 	"net/http"
+	//"strconv"
 	"time"
 
 	"github.com/gorilla/websocket"
@@ -72,7 +78,36 @@ func (c *Client) writeMessages() {
 				c.closeConnection()
 				return
 			}
-			err := c.conn.WriteMessage(websocket.TextMessage, []byte(message.GetMessage()))
+
+			fmt.Sprintf("%#v", message)
+
+			messageString := "{\"message\":" + message.GetMessage() +
+				"\", \"senderId\":" + message.GetSenderID() +
+				"\", \"userId\": \"" + message.GetUserID() +
+				"\" , \"storeId\": \"" + strconv.Itoa((int)(20)) +"\" }"
+
+			tempJson, _ := json.Marshal(messageString)
+
+			//log.Print(tempJson)
+
+			fmt.Println(string(tempJson))
+
+			//
+			//a := &InfoWsMessage{message.GetMessage(), message.GetUserID(), message.GetStoreID(), message.GetSenderID()}
+			//
+			//out, err2 := json.Marshal(a)
+			//if err2 != nil {
+			//	panic (err2)
+			//}
+			//
+			//messageStr := string(out)
+			//
+			//fmt.Println(string(messageStr))
+
+			log.Print(message.GetMessage())
+			//json = "{message: " + message.GetMessage() + ", "
+
+			err := c.conn.WriteMessage(websocket.TextMessage, []byte(tempJson))
 			if err != nil {
 				log.Printf("error writing message: %v", err)
 				c.closeConnection()

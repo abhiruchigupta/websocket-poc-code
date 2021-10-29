@@ -8,25 +8,30 @@ import (
 	"time"
 )
 
-type ListingEvent struct {
+type MessageEvent struct {
 	UserId string
 	StoreId int64
 	Message string
+	SenderId string
 }
 
-func (p ListingEvent) GetUserID() string {
+func (p MessageEvent) GetUserID() string {
 	return p.UserId
 }
 
-func (p ListingEvent) GetMessage() string {
+func (p MessageEvent) GetMessage() string {
 	return p.Message
 }
 
-func (p ListingEvent) GetStoreID() int64 {
+func (p MessageEvent) GetStoreID() int64 {
 	return p.StoreId
 }
 
-type ListingEventMessage struct {
+func (p MessageEvent) GetSenderID() string {
+	return p.SenderId
+}
+
+type MessageEventMessage struct {
 	City    string `json:"city"`
 	Zipcode string `json:"zipcode"`
 	Address string `json:"address"`
@@ -59,7 +64,7 @@ func (h *Hub) EventReceiver(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var eventMessage ListingEventMessage
+	var eventMessage MessageEventMessage
 	err = json.Unmarshal(body, &eventMessage)
 	if err != nil {
 		w.WriteHeader(500)
@@ -73,7 +78,7 @@ func (h *Hub) EventReceiver(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	message, _ := json.Marshal(eventMessage)
-	event := ListingEvent{
+	event := MessageEvent{
 		UserId:  userID,
 		Message: string(message),
 	}

@@ -21,8 +21,11 @@ func main() {
 	http.HandleFunc("/subscribe", func(w http.ResponseWriter, r *http.Request) {
 		ws.ServeWs(hub, w, r)
 	})
+
 	http.HandleFunc("/mls", hub.EventReceiver)
+
 	http.HandleFunc("/send", hub.PostEvent)
+
 	err := http.ListenAndServe(*addr, nil)
 	if err != nil {
 		log.Fatal("ListenAndServe: ", err)

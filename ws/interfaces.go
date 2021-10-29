@@ -6,11 +6,13 @@ type WsMessage interface {
 	GetUserID() string
 	GetStoreID() int64
 	GetMessage() string
+	GetSenderID() string
 }
 
 type DbMessage struct {
 	ID         *int64
 	UserID     *string
+	SenderID   *string
 	Message    *string
 	ReceivedAt *time.Time
 	Sent       *bool
