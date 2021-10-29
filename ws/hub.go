@@ -103,26 +103,26 @@ type Info struct {
 }
 
 type InfoWsMessage struct {
-	message string
-	userID  string
-	storeID int64
-	senderID string
+	Message string `json:"message"`
+	UserID  string `json:"userID"`
+	StoreID int64 `json:"storeID"`
+	SenderID string `json:"senderID"`
 }
 
 func (i InfoWsMessage) GetUserID() string {
-	return i.userID
+	return i.UserID
 }
 
 func (i InfoWsMessage) GetMessage() string {
-	return i.message
+	return i.Message
 }
 
 func (i InfoWsMessage) GetStoreID() int64 {
-	return i.storeID
+	return i.StoreID
 }
 
 func (i InfoWsMessage) GetSenderID() string {
-	return i.senderID
+	return i.SenderID
 }
 
 func (h *Hub) PostEvent(w http.ResponseWriter, r *http.Request) {
@@ -151,10 +151,10 @@ func (h *Hub) PostEvent(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	message := InfoWsMessage{
-		userID:  userID,
-		message: info.Message,
-		storeID: 0,
-		senderID: senderID,
+		UserID:  userID,
+		Message: info.Message,
+		StoreID: 0,
+		SenderID: senderID,
 	}
 	h.BroadcastMessage(message)
 }

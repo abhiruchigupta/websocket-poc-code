@@ -13,19 +13,27 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-
-type WsMessage interface {
-	GetUserID() string
-	GetStoreID() int64
-	GetMessage() string
-	GetSenderID() string
+type InfoWsMessage struct {
+	Message string `json:"message"`
+	UserID  string `json:"userID"`
+	StoreID int64 `json:"storeID"`
+	SenderID string `json:"senderID"`
 }
 
-type InfoWsMessage struct {
-	message string
-	userID  string
-	storeID int64
-	senderID string
+func (i InfoWsMessage) GetUserID() string {
+	return i.UserID
+}
+
+func (i InfoWsMessage) GetMessage() string {
+	return i.Message
+}
+
+func (i InfoWsMessage) GetStoreID() int64 {
+	return i.StoreID
+}
+
+func (i InfoWsMessage) GetSenderID() string {
+	return i.SenderID
 }
 
 var addr = flag.String("addr", "localhost:8080", "http service address")
@@ -57,35 +65,16 @@ func main() {
 
 	go func() {
 		for {
-			//var msg string
-
-			//err := c.ReadJSON(&msg)
-
-			_, message, err := c.ReadMessage()
-			//data := []byte(message)
-
-			log.Printf("recv: %s", message)
-
-			//log.Println("msg rcvd: ", message)
-
-			//var input InfoWsMessage
-			//
-			//err = json.Unmarshal(data, &input)
-			//fmt.Println(err)
-
-			//fmt.Printf("%v , %v, %v, %v", input.message, input.senderID, input.storeID, input.userID)
-
-			//log.Println("error: , msg: , final json: input", err, msg, input)
-
-
+			var msg InfoWsMessage
+			err := c.ReadJSON(&msg)
 
 			if err != nil {
 				log.Println("read:", err)
 				done <- struct{}{}
 				return
 			}
+			log.Printf("recv: %s from %s", msg.Message, msg.SenderID)
 
-			//log.Print("recv: %v from sender: %v", input.message, input.senderID)
 		}
 	}()
 
