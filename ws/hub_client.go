@@ -80,6 +80,7 @@ func (c *Client) writeMessages() {
 				UserID: message.GetUserID(),
 				StoreID: message.GetStoreID(),
 				SenderID: message.GetSenderID(),
+				Type: message.GetMessageType(),
 			}
 
 			err := c.conn.WriteJSON(a)

@@ -13,6 +13,7 @@ type MessageEvent struct {
 	StoreId int64
 	Message string
 	SenderId string
+	Type string
 }
 
 func (p MessageEvent) GetUserID() string {
@@ -29,6 +30,10 @@ func (p MessageEvent) GetStoreID() int64 {
 
 func (p MessageEvent) GetSenderID() string {
 	return p.SenderId
+}
+
+func (p MessageEvent) GetMessageType() string {
+	return p.Type
 }
 
 type MessageEventMessage struct {

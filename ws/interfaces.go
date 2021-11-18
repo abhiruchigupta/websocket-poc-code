@@ -7,6 +7,7 @@ type WsMessage interface {
 	GetStoreID() int64
 	GetMessage() string
 	GetSenderID() string
+	GetMessageType() string
 }
 
 type DbMessage struct {
