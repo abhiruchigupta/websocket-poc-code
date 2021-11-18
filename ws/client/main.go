@@ -18,6 +18,7 @@ type InfoWsMessage struct {
 	UserID  string `json:"userID"`
 	StoreID int64 `json:"storeID"`
 	SenderID string `json:"senderID"`
+	Type string `json:"messageType"`
 }
 
 func (i InfoWsMessage) GetUserID() string {
@@ -34,6 +35,10 @@ func (i InfoWsMessage) GetStoreID() int64 {
 
 func (i InfoWsMessage) GetSenderID() string {
 	return i.SenderID
+}
+
+func (i InfoWsMessage) GetMessageType() string {
+	return i.Type
 }
 
 var addr = flag.String("addr", "localhost:8080", "http service address")
@@ -73,7 +78,7 @@ func main() {
 				done <- struct{}{}
 				return
 			}
-			log.Printf("recv: %s from %s", msg.Message, msg.SenderID)
+			log.Printf("recv: %s of type %s from %s", msg.Message, msg.Type, msg.SenderID)
 
 		}
 	}()

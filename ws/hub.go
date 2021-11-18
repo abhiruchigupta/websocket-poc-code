@@ -99,7 +99,8 @@ func (h *Hub) removeClient(client *Client) {
 }
 
 type Info struct {
-	Message string `json:"message"`
+	Message json.RawMessage `json:"message"`
+	Type string `json:"messageType"`
 }
 
 type InfoWsMessage struct {
@@ -107,6 +108,7 @@ type InfoWsMessage struct {
 	UserID  string `json:"userID"`
 	StoreID int64 `json:"storeID"`
 	SenderID string `json:"senderID"`
+	Type string `json:"messageType"`
 }
 
 func (i InfoWsMessage) GetUserID() string {
@@ -123,6 +125,10 @@ func (i InfoWsMessage) GetStoreID() int64 {
 
 func (i InfoWsMessage) GetSenderID() string {
 	return i.SenderID
+}
+
+func (i InfoWsMessage) GetMessageType() string {
+	return i.Type
 }
 
 func (h *Hub) PostEvent(w http.ResponseWriter, r *http.Request) {
@@ -150,17 +156,19 @@ func (h *Hub) PostEvent(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(500)
 		return
 	}
+	messageBytes, err := json.Marshal(&info.Message)
 	message := InfoWsMessage{
 		UserID:  userID,
-		Message: info.Message,
+		Message: string(messageBytes),
 		StoreID: 0,
 		SenderID: senderID,
+		Type : info.Type,
 	}
 	h.BroadcastMessage(message)
 }
 
 func (h *Hub) BroadcastMessage(message WsMessage) {
-	log.Printf("userID: %s, message: %s, senderID: %s\n", message.GetUserID(), message.GetMessage(), message.GetSenderID())
+	log.Printf("userID: %s, message: %s, type: %s, senderID: %s\n", message.GetUserID(), message.GetMessage(), message.GetMessageType(), message.GetSenderID())
 	h.broadcast <- message
 }
 
